@@ -118,4 +118,20 @@ class TestFileStorage(unittest.TestCase):
     def test_get(self):
         """Test that get returns the object we want"""
         storage = FileStorage()
-        inst = State(name='Alabama')
+        instance = State(name='Alabama')
+        instance_id = instance.id
+        name = instance.name
+        instance.save()
+        returned_instance = storage.get(State, instance_id)
+        self.assertEqual(name, returned_instance.name)
+
+    @unittest.skipIf(models.storage_t == 'db', 'Not testing file storage')
+    def test_count(self):
+        """Test that count returns the total amount of objects"""
+        storage = FileStorage()
+        total = len(storage.all())
+        total_count = storage.count()
+        self.assertTrue(total == total_count)
+        total = len(storage.all(State))
+        total_count = storage.count(State)
+        self.assertTrue(total == total_count)
