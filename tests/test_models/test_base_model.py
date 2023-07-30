@@ -82,6 +82,9 @@ class TestBaseModel(unittest.TestCase):
         """Test that two BaseModel instances have different datetime objects
         and that upon creation have identical updated_at and created_at
         value."""
+        # utcnow and now are different, now would give you time based on your
+        # timezone, but utcnow would give you based on GMT + 0 or utc + 0
+        # right now my location is GMT + 1 or utc + 1
         tic = datetime.now()
         inst1 = BaseModel()
         toc = datetime.now()
@@ -151,6 +154,7 @@ class TestBaseModel(unittest.TestCase):
         inst = BaseModel()
         old_created_at = inst.created_at
         old_updated_at = inst.updated_at
+        time.sleep(1e-4)
         inst.save()
         new_created_at = inst.created_at
         new_updated_at = inst.updated_at
