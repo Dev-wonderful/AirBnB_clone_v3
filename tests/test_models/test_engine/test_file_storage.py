@@ -3,7 +3,6 @@
 Contains the TestFileStorageDocs classes
 """
 
-from datetime import datetime
 import inspect
 import models
 from models.engine import file_storage
@@ -113,3 +112,25 @@ class TestFileStorage(unittest.TestCase):
         with open("file.json", "r") as f:
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
+
+    @unittest.skipIf(models.storage_t == 'db', 'Not testing file storage')
+    def test_get(self):
+        """Test that get returns the object we want"""
+        storage = FileStorage()
+        instance = State(name='Alabama')
+        instance_id = instance.id
+        name = instance.name
+        instance.save()
+        returned_instance = storage.get(State, instance_id)
+        self.assertEqual(name, returned_instance.name)
+
+    @unittest.skipIf(models.storage_t == 'db', 'Not testing file storage')
+    def test_count(self):
+        """Test that count returns the total amount of objects"""
+        storage = FileStorage()
+        total = len(storage.all())
+        total_count = storage.count()
+        self.assertTrue(total == total_count)
+        total = len(storage.all(State))
+        total_count = storage.count(State)
+        self.assertTrue(total == total_count)
