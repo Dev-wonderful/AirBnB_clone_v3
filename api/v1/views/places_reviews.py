@@ -1,80 +1,101 @@
 #!/usr/bin/python3
-"""handle request for state views"""
+"""handle request for review views"""
 from flask import jsonify, abort, request
 from api.v1.views import api_views
-from models.state import State
+from models.review import Review
+from models.place import Place
+from models.user import User
 import models
 
 
-@api_views.route('/states', strict_slashes=False)
-def get_state():
-    """GetS the states from the database"""
-    data = []
+@api_views.route('/places/<place_id>/reviews', strict_slashes=False)
+def get_reviews_by_place(place_id):
+    """Gets the reviews in a place from the database"""
     storage = models.storage
-    states = storage.all(State).values()
-    # loop through each state to convert to dict
-    for state in states:
-        state = state.to_dict()
-        data.append(state)
+    data = []
+    place = storage.get(Place, place_id)
+    if place is None:
+        abort(404)
+    for review in place.reviews:
+        review = review.to_dict()
+        data.append(review)
     return jsonify(data)
 
 
-@api_views.route('/states/<state_id>', strict_slashes=False)
-def get_state_by_id(state_id):
-    """GetS a state from the database"""
+@api_views.route('/reviews/<review_id>', strict_slashes=False)
+def get_review_by_id(review_id):
+    """GetS a review from the database"""
     storage = models.storage
     # check for presence and return, else throw error
-    state = storage.get(State, state_id)
-    if state is None:
+    review = storage.get(Review, review_id)
+    if review is None:
         abort(404)
-    state = state.to_dict()
-    return jsonify(state)
+    review = review.to_dict()
+    return jsonify(review)
 
 
-@api_views.route('/states/<state_id>', strict_slashes=False, 
+@api_views.route('/reviews/<review_id>', strict_slashes=False,
                  methods=['DELETE'])
-def delete_state(state_id):
-    """delete a state from the database, else raise not found error"""
+def delete_review(review_id):
+    """delete a review from the database, else raise not found error"""
     storage = models.storage
     # check for presence and return, else throw error
-    state = storage.get(State, state_id)
-    if state is None:
+    review = storage.get(Review, review_id)
+    if review is None:
         abort(404)
-    storage.delete(state)
+    storage.delete(review)
     return jsonify({})
 
 
-@api_views.route('/states', strict_slashes=False, methods=['POST'])
-def add_state():
-    """adds a state to the database"""
+@api_views.route('/places/<place_id>/reviews', strict_slashes=False,
+                 methods=['POST'])
+def add_review(place_id):
+    """adds a review to the database"""
     storage = models.storage
     # get json data or silently return None if not a json type
-    state = request.get_json(silent=True)
-    if state is None:
+    review = request.get_json(silent=True)
+    if review is None:
         return 'Not a JSON', 400
-    # check for presence of required param
-    if state.get('name') is None:
-        return 'Missing name', 400
-    storage.new(state)
-    storage.save()
-    return state, 201
+
+    # check if the place exists
+    place = storage.get(Place, place_id)
+    if place is None:
+        abort(404)
+
+    # check for existence of required param
+    if review.get('user_id') is None:
+        return 'Missing user_id', 400
+    else:
+        user_id = place.get('user_id')
+        user = storage.get(User, user_id)
+        if user is None:
+            abort(404)
+    if review.get('text') is None:
+        return 'Missing text', 400
+    
+    review['place_id'] = place_id
+    new_instance = Review(**review)
+    new_instance.save()
+    return new_instance.to_dict(), 201
 
 
-@api_views.route('/states/<state_id>', strict_slashes=False, methods=['PUT'])
-def modify_state(state_id):
-    """modifies a state in the database"""
+@api_views.route('/reviews/<review_id>', strict_slashes=False,
+                 methods=['PUT'])
+def modify_review(review_id):
+    """modifies a review in the database"""
     storage = models.storage
     # check for presence and return, else throw error
-    state = storage.get(State, state_id)
-    if state is None:
+    review = storage.get(Review, review_id)
+    if review is None:
         abort(404)
     # get json data or silently return None if not a json type
-    state_update = request.get_json(silent=True)
-    if state_update is None:
+    review_update = request.get_json(silent=True)
+    if review_update is None:
         return 'Not a JSON', 400
     # check for presence of required param
-    if state_update.get('name') is None:
-        return 'Missing name', 400
-    state.name = state_update.get('name')
+    ignore = ['id', 'user_id', 'place_id', 'created_at', 'updated_at']
+    for key, value in review_update.items():
+        if key not in ignore:
+            setattr(review, key, value)
     storage.save()
-    return state, 201
+    return review.to_dict()
