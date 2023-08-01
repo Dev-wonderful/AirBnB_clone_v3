@@ -68,7 +68,7 @@ def add_review(place_id):
         return 'Missing user_id', 400
     if review.get('text') is None:
         return 'Missing text', 400
-    user_id = place.get('user_id')
+    user_id = review.get('user_id')
     user = storage.get(User, user_id)
     if user is None:
         abort(404)
