@@ -1,80 +1,80 @@
 #!/usr/bin/python3
-"""handle request for state views"""
+"""handle request for user views"""
 from flask import jsonify, abort, request
 from api.v1.views import api_views
-from models.state import State
+from models.user import User
 import models
 
 
-@api_views.route('/states', strict_slashes=False)
-def get_state():
-    """GetS the states from the database"""
+@api_views.route('/users', strict_slashes=False)
+def get_user():
+    """GetS the users from the database"""
     data = []
     storage = models.storage
-    states = storage.all(State).values()
-    # loop through each state to convert to dict
-    for state in states:
-        state = state.to_dict()
-        data.append(state)
+    users = storage.all(User).values()
+    # loop through each user to convert to dict
+    for user in users:
+        user = user.to_dict()
+        data.append(user)
     return jsonify(data)
 
 
-@api_views.route('/states/<state_id>', strict_slashes=False)
-def get_state_by_id(state_id):
-    """GetS a state from the database"""
+@api_views.route('/users/<user_id>', strict_slashes=False)
+def get_user_by_id(user_id):
+    """GetS a user from the database"""
     storage = models.storage
     # check for presence and return, else throw error
-    state = storage.get(State, state_id)
-    if state is None:
+    user = storage.get(User, user_id)
+    if user is None:
         abort(404)
-    state = state.to_dict()
-    return jsonify(state)
+    user = user.to_dict()
+    return jsonify(user)
 
 
-@api_views.route('/states/<state_id>', strict_slashes=False, 
+@api_views.route('/users/<user_id>', strict_slashes=False,
                  methods=['DELETE'])
-def delete_state(state_id):
-    """delete a state from the database, else raise not found error"""
+def delete_user(user_id):
+    """delete a user from the database, else raise not found error"""
     storage = models.storage
     # check for presence and return, else throw error
-    state = storage.get(State, state_id)
-    if state is None:
+    user = storage.get(User, user_id)
+    if user is None:
         abort(404)
-    storage.delete(state)
+    storage.delete(user)
+    storage.save()
     return jsonify({})
 
 
-@api_views.route('/states', strict_slashes=False, methods=['POST'])
-def add_state():
-    """adds a state to the database"""
-    storage = models.storage
+@api_views.route('/users', strict_slashes=False, methods=['POST'])
+def add_user():
+    """adds a user to the database"""
+    # storage = models.storage
     # get json data or silently return None if not a json type
-    state = request.get_json(silent=True)
-    if state is None:
+    user = request.get_json(silent=True)
+    if user is None:
         return 'Not a JSON', 400
     # check for presence of required param
-    if state.get('name') is None:
+    if user.get('email') is None:
         return 'Missing name', 400
-    storage.new(state)
-    storage.save()
-    return state, 201
+    elif user.get('password') is None:
+        return 'Missing password', 400
+    new_instance = User(**user)
+    new_instance.save()
+    return new_instance.to_dict(), 201
 
 
-@api_views.route('/states/<state_id>', strict_slashes=False, methods=['PUT'])
-def modify_state(state_id):
-    """modifies a state in the database"""
+@api_views.route('/users/<user_id>', strict_slashes=False, methods=['PUT'])
+def modify_user(user_id):
+    """modifies a user in the database"""
     storage = models.storage
     # check for presence and return, else throw error
-    state = storage.get(State, state_id)
-    if state is None:
+    user = storage.get(User, user_id)
+    if user is None:
         abort(404)
     # get json data or silently return None if not a json type
-    state_update = request.get_json(silent=True)
-    if state_update is None:
+    user_update = request.get_json(silent=True)
+    if user_update is None:
         return 'Not a JSON', 400
-    # check for presence of required param
-    if state_update.get('name') is None:
-        return 'Missing name', 400
-    state.name = state_update.get('name')
+    user.__dict__.update(user_update)
     storage.save()
-    return state, 201
+    return user.to_dict()
