@@ -12,11 +12,12 @@ app.register_blueprint(api_views)
 @app.errorhandler(404)
 def not_found(error):
     """handles not found errors"""
-    return jsonify({"error": "Not found"})
+    return jsonify({"error": "Not found"}), 404
 
 
 @app.teardown_appcontext
 def end_session(error=None):
+    """close the database after a request session"""
     storage.close()
 
 
