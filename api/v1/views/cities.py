@@ -3,17 +3,19 @@
 from flask import jsonify, abort, request
 from api.v1.views import api_views
 from models.city import City
+from models.state import State
 import models
 
 
-@api_views.route('/cities', strict_slashes=False)
-def get_cities():
-    """GetS the cities from the database"""
-    data = []
+@api_views.route('/states/<state_id>/cities', strict_slashes=False)
+def get_cities_by_state(state_id):
+    """Gets the cities from a state in the database"""
     storage = models.storage
-    cities = storage.all(City).values()
-    # loop through each city to convert to dict
-    for city in cities:
+    data = []
+    state = storage.get(State, state_id)
+    if state is None:
+        abort(404)
+    for city in state.cities:
         city = city.to_dict()
         data.append(city)
     return jsonify(data)
@@ -44,10 +46,11 @@ def delete_city(city_id):
     return jsonify({})
 
 
-@api_views.route('/cities', strict_slashes=False, methods=['POST'])
-def add_city():
+@api_views.route('/states/<state_id>/cities', strict_slashes=False, 
+                 methods=['POST'])
+def add_city(state_id):
     """adds a city to the database"""
-    storage = models.storage
+    # storage = models.storage
     # get json data or silently return None if not a json type
     city = request.get_json(silent=True)
     if city is None:
@@ -55,9 +58,9 @@ def add_city():
     # check for presence of required param
     if city.get('name') is None:
         return 'Missing name', 400
-    storage.new(city)
-    storage.save()
-    return city, 201
+    city['state_id'] = state_id
+    new_instance = City(**city)
+    return new_instance.to_dict(), 201
 
 
 @api_views.route('/cities/<city_id>', strict_slashes=False, methods=['PUT'])
@@ -77,4 +80,4 @@ def modify_city(city_id):
         return 'Missing name', 400
     city.name = city_update.get('name')
     storage.save()
-    return city, 201
+    return city.to_dict()
