@@ -1,12 +1,19 @@
 #!/usr/bin/python3
 """Api for our app"""
-from flask import Flask
+import os
+from flask import Flask, jsonify
 from models import storage
 from api.v1.views import api_views
-import os
 
 app = Flask(__name__)
 app.register_blueprint(api_views)
+
+
+@app.errorhandler(404)
+def not_found(error):
+    """handles not found errors"""
+    return jsonify({"error": "Not found"})
+
 
 @app.teardown_appcontext
 def end_session(error=None):
