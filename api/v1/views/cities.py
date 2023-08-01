@@ -33,7 +33,7 @@ def get_city_by_id(city_id):
     return jsonify(city)
 
 
-@api_views.route('/cities/<city_id>', strict_slashes=False, 
+@api_views.route('/cities/<city_id>', strict_slashes=False,
                  methods=['DELETE'])
 def delete_city(city_id):
     """delete a city from the database, else raise not found error"""
@@ -46,7 +46,7 @@ def delete_city(city_id):
     return jsonify({})
 
 
-@api_views.route('/states/<state_id>/cities', strict_slashes=False, 
+@api_views.route('/states/<state_id>/cities', strict_slashes=False,
                  methods=['POST'])
 def add_city(state_id):
     """adds a city to the database"""
