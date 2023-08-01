@@ -55,7 +55,7 @@ def add_user():
         return 'Not a JSON', 400
     # check for presence of required param
     if user.get('email') is None:
-        return 'Missing name', 400
+        return 'Missing email', 400
     elif user.get('password') is None:
         return 'Missing password', 400
     new_instance = User(**user)

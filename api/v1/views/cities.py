@@ -9,7 +9,7 @@ import models
 
 @api_views.route('/states/<state_id>/cities', strict_slashes=False)
 def get_cities_by_state(state_id):
-    """Gets the cities from a state in the database"""
+    """Gets the cities in a state from the database"""
     storage = models.storage
     data = []
     state = storage.get(State, state_id)
