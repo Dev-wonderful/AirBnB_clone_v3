@@ -66,13 +66,12 @@ def add_review(place_id):
     # check for existence of required param
     if review.get('user_id') is None:
         return 'Missing user_id', 400
-    else:
-        user_id = place.get('user_id')
-        user = storage.get(User, user_id)
-        if user is None:
-            abort(404)
     if review.get('text') is None:
         return 'Missing text', 400
+    user_id = place.get('user_id')
+    user = storage.get(User, user_id)
+    if user is None:
+        abort(404)
 
     review['place_id'] = place_id
     new_instance = Review(**review)
