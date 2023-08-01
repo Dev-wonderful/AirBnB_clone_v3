@@ -4,9 +4,13 @@ import os
 from flask import Flask, jsonify
 from models import storage
 from api.v1.views import api_views
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.register_blueprint(api_views)
+
+resource = {r"/*": {"origins": "*"}}
+CORS(app, resources=resource)
 
 
 @app.errorhandler(404)
