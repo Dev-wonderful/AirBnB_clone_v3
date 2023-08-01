@@ -7,20 +7,21 @@ import models
 
 
 @api_views.route('/states', strict_slashes=False)
-def state():
+def get_state():
     """GetS the states from the database"""
     data = []
     storage = models.storage
     states = storage.all(State)
     # loop through each state to convert to dict
     for state in states:
+        print(state)
         state = state.to_dict()
         data.append(state)
     return jsonify(data)
 
 
 @api_views.route('/states/<state_id>', strict_slashes=False)
-def state(state_id):
+def get_state_by_id(state_id):
     """GetS a state from the database"""
     storage = models.storage
     # check for presence and return, else throw error
@@ -33,7 +34,7 @@ def state(state_id):
 
 @api_views.route('/states/<state_id>', strict_slashes=False, 
                  methods=['DELETE'])
-def state(state_id):
+def delete_state(state_id):
     """delete a state from the database, else raise not found error"""
     storage = models.storage
     # check for presence and return, else throw error
@@ -45,7 +46,7 @@ def state(state_id):
 
 
 @api_views.route('/states', strict_slashes=False, methods=['POST'])
-def state():
+def add_state():
     """adds a state to the database"""
     storage = models.storage
     # get json data or silently return None if not a json type
@@ -61,7 +62,7 @@ def state():
 
 
 @api_views.route('/states/<state_id>', strict_slashes=False, methods=['PUT'])
-def state(state_id):
+def modify_state(state_id):
     """modifies a state in the database"""
     storage = models.storage
     # check for presence and return, else throw error
