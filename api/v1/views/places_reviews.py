@@ -44,6 +44,7 @@ def delete_review(review_id):
     if review is None:
         abort(404)
     storage.delete(review)
+    storage.save()
     return jsonify({})
 
 
@@ -72,7 +73,7 @@ def add_review(place_id):
             abort(404)
     if review.get('text') is None:
         return 'Missing text', 400
-    
+
     review['place_id'] = place_id
     new_instance = Review(**review)
     new_instance.save()
