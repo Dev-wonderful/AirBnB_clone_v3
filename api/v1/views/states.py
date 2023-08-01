@@ -41,13 +41,14 @@ def delete_state(state_id):
     if state is None:
         abort(404)
     storage.delete(state)
+    storage.save()
     return jsonify({})
 
 
 @api_views.route('/states', strict_slashes=False, methods=['POST'])
 def add_state():
     """adds a state to the database"""
-    storage = models.storage
+    # storage = models.storage
     # get json data or silently return None if not a json type
     state = request.get_json(silent=True)
     if state is None:
@@ -55,9 +56,9 @@ def add_state():
     # check for presence of required param
     if state.get('name') is None:
         return 'Missing name', 400
-    storage.new(state)
-    storage.save()
-    return state, 201
+    new_instance = State(**state)
+    new_instance.save()
+    return new_instance.to_dict(), 201
 
 
 @api_views.route('/states/<state_id>', strict_slashes=False, methods=['PUT'])
@@ -77,4 +78,4 @@ def modify_state(state_id):
         return 'Missing name', 400
     state.name = state_update.get('name')
     storage.save()
-    return state, 201
+    return state.to_dict(), 201
