@@ -31,7 +31,7 @@ def get_amenity_by_id(amenity_id):
     return jsonify(amenity)
 
 
-@api_views.route('/amenities/<amenity_id>', strict_slashes=False, 
+@api_views.route('/amenities/<amenity_id>', strict_slashes=False,
                  methods=['DELETE'])
 def delete_amenity(amenity_id):
     """delete a amenity from the database, else raise not found error"""
@@ -61,7 +61,8 @@ def add_amenity():
     return new_instance.to_dict(), 201
 
 
-@api_views.route('/amenities/<amenity_id>', strict_slashes=False, methods=['PUT'])
+@api_views.route('/amenities/<amenity_id>', strict_slashes=False, 
+                 methods=['PUT'])
 def modify_amenity(amenity_id):
     """modifies a amenity in the database"""
     storage = models.storage
