@@ -11,9 +11,10 @@ def get_state():
     """GetS the states from the database"""
     data = []
     storage = models.storage
-    states = storage.all(State)
+    states = storage.all(State).values()
     # loop through each state to convert to dict
     for state in states:
+        print('get states')
         print(state)
         state = state.to_dict()
         data.append(state)
