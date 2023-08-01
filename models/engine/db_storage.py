@@ -81,7 +81,7 @@ class DBStorage:
             the object based on the class and its ID, or None if not found"""
         if cls is not None and issubclass(cls, BaseModel):
             the_object = ""
-            the_object = self.__session.query(cls).filter(cls.id == id).first()
+            the_object = self.__session.query(cls).filter_by(id=id).first()
             return the_object
         else:
             return None

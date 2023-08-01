@@ -75,6 +75,9 @@ def modify_user(user_id):
     user_update = request.get_json(silent=True)
     if user_update is None:
         return 'Not a JSON', 400
-    user.__dict__.update(user_update)
+    ignore = ['id', 'email', 'created_at', 'updated_at']
+    for key, value in user_update.items():
+        if key not in ignore:
+            setattr(user, key, value)
     storage.save()
     return user.to_dict()
