@@ -14,8 +14,6 @@ def get_state():
     states = storage.all(State).values()
     # loop through each state to convert to dict
     for state in states:
-        print('get states')
-        print(state)
         state = state.to_dict()
         data.append(state)
     return jsonify(data)
