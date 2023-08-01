@@ -78,4 +78,4 @@ def modify_state(state_id):
         return 'Missing name', 400
     state.name = state_update.get('name')
     storage.save()
-    return state.to_dict(), 201
+    return state.to_dict()
