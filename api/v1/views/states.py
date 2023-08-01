@@ -6,7 +6,7 @@ from models.state import State
 import models
 
 
-@app_views.route('/states', strict_slashes=False)
+@api_views.route('/states', strict_slashes=False)
 def state():
     """GetS the states from the database"""
     data = []
@@ -19,7 +19,7 @@ def state():
     return jsonify(data)
 
 
-@app_views.route('/states/<state_id>', strict_slashes=False)
+@api_views.route('/states/<state_id>', strict_slashes=False)
 def state(state_id):
     """GetS a state from the database"""
     storage = models.storage
@@ -31,7 +31,7 @@ def state(state_id):
     return jsonify(state)
 
 
-@app_views.route('/states/<state_id>', strict_slashes=False, 
+@api_views.route('/states/<state_id>', strict_slashes=False, 
                  methods=['DELETE'])
 def state(state_id):
     """delete a state from the database, else raise not found error"""
@@ -44,7 +44,7 @@ def state(state_id):
     return jsonify({})
 
 
-@app_views.route('/states', strict_slashes=False, methods=['POST'])
+@api_views.route('/states', strict_slashes=False, methods=['POST'])
 def state():
     """adds a state to the database"""
     storage = models.storage
@@ -60,7 +60,7 @@ def state():
     return state, 201
 
 
-@app_views.route('/states/<state_id>', strict_slashes=False, methods=['PUT'])
+@api_views.route('/states/<state_id>', strict_slashes=False, methods=['PUT'])
 def state(state_id):
     """modifies a state in the database"""
     storage = models.storage
