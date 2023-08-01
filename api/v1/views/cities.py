@@ -63,6 +63,7 @@ def add_city(state_id):
         return 'Missing name', 400
     city['state_id'] = state_id
     new_instance = City(**city)
+    new_instance.save()
     return new_instance.to_dict(), 201
 
 

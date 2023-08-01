@@ -41,13 +41,14 @@ def delete_amenity(amenity_id):
     if amenity is None:
         abort(404)
     storage.delete(amenity)
+    storage.save()
     return jsonify({})
 
 
 @api_views.route('/amenities', strict_slashes=False, methods=['POST'])
 def add_amenity():
     """adds a amenity to the database"""
-    storage = models.storage
+    # storage = models.storage
     # get json data or silently return None if not a json type
     amenity = request.get_json(silent=True)
     if amenity is None:
@@ -55,9 +56,9 @@ def add_amenity():
     # check for presence of required param
     if amenity.get('name') is None:
         return 'Missing name', 400
-    storage.new(amenity)
-    storage.save()
-    return amenity, 201
+    new_instance = Amenity(**amenity)
+    new_instance.save()
+    return new_instance.to_dict(), 201
 
 
 @api_views.route('/amenities/<amenity_id>', strict_slashes=False, methods=['PUT'])
@@ -77,4 +78,4 @@ def modify_amenity(amenity_id):
         return 'Missing name', 400
     amenity.name = amenity_update.get('name')
     storage.save()
-    return amenity, 201
+    return amenity.to_dict()
