@@ -12,6 +12,7 @@ def state():
     data = []
     storage = models.storage
     states = storage.all(State)
+    # loop through each state to convert to dict
     for state in states:
         state = state.to_dict()
         data.append(state)
@@ -22,6 +23,7 @@ def state():
 def state(state_id):
     """GetS a state from the database"""
     storage = models.storage
+    # check for presence and return, else throw error
     state = storage.get(State, state_id)
     if state is None:
         abort(404)
@@ -34,6 +36,7 @@ def state(state_id):
 def state(state_id):
     """delete a state from the database, else raise not found error"""
     storage = models.storage
+    # check for presence and return, else throw error
     state = storage.get(State, state_id)
     if state is None:
         abort(404)
@@ -45,9 +48,11 @@ def state(state_id):
 def state():
     """adds a state to the database"""
     storage = models.storage
+    # get json data or silently return None if not a json type
     state = request.get_json(silent=True)
     if state is None:
         return 'Not a JSON', 400
+    # check for presence of required param
     if state.get('name') is None:
         return 'Missing name', 400
     storage.new(state)
@@ -59,12 +64,17 @@ def state():
 def state(state_id):
     """modifies a state in the database"""
     storage = models.storage
+    # check for presence and return, else throw error
     state = storage.get(State, state_id)
     if state is None:
+        abort(404)
+    # get json data or silently return None if not a json type
+    state_update = request.get_json(silent=True)
+    if state_update is None:
         return 'Not a JSON', 400
-    state = request.get_json(silent=True)
-    if state.get('name') is None:
+    # check for presence of required param
+    if state_update.get('name') is None:
         return 'Missing name', 400
-    storage.new(state)
+    state.name = state_update.get('name')
     storage.save()
     return state, 201
