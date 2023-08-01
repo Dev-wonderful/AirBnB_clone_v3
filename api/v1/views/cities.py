@@ -50,12 +50,15 @@ def delete_city(city_id):
                  methods=['POST'])
 def add_city(state_id):
     """adds a city to the database"""
-    # storage = models.storage
+    storage = models.storage
     # get json data or silently return None if not a json type
     city = request.get_json(silent=True)
     if city is None:
         return 'Not a JSON', 400
-    # check for presence of required param
+    # check for existence of state and presence of required param
+    state = storage.get(State, state_id)
+    if state is None:
+        abort(404)
     if city.get('name') is None:
         return 'Missing name', 400
     city['state_id'] = state_id
